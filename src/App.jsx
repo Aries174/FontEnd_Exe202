@@ -11,7 +11,7 @@ function App() {
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route
-          path="/bussiness"
+          path="/bussiness/*"
           element={
             <RequireAuth roles={[
               'restaurant_owner',

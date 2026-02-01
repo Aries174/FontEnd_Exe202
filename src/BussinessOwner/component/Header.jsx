@@ -29,17 +29,21 @@ localStorage.removeItem("authToken");
 useEffect(() => {
   const fetchRestaurant = async () => {
     try {
-      const data = await getBusinessOwnerProfile();
+      const res = await getBusinessOwnerProfile();
+      console.log("RESTAURANT PROFILE:", res);
 
-      setStoreName(data.name);
-      setEmail(data.email);
+      const restaurant = res.data; // 👈 QUAN TRỌNG
+
+      setStoreName(restaurant.name);
+      setEmail(restaurant.email || "");
     } catch (error) {
-      console.error("Không lấy được thông tin cửa hàng");
+      console.error("Không lấy được thông tin cửa hàng", error);
     }
   };
 
   fetchRestaurant();
 }, []);
+
 
   return (
     <>
@@ -90,15 +94,15 @@ useEffect(() => {
                 </div>
                 <div className="user-info d-none d-lg-block">
                   <div className="username">{storeName}</div>
-                  <div className="role">Chủ cửa hàng</div>
+                  <div className="role">{storeName}</div>
                 </div>
                 <ChevronDown size={16} className="text-muted ms-2" />
               </Dropdown.Toggle>
 
               <Dropdown.Menu className="custom-dropdown-menu mt-2 p-2 border-0 shadow-lg animate-slide-in">
                 <div className="px-3 py-2 border-bottom mb-2">
-                    <p className="mb-0 fw-bold text-dark">Mì cay Seoul</p>
-                    <small className="text-muted">micayseoul@gmail.com</small>
+                    <p className="mb-0 fw-bold text-dark">{storeName}</p>
+                    <small className="text-muted">{email}</small>
                 </div>
                 
                 <Dropdown.Item href="/profile" className="dropdown-item-custom">

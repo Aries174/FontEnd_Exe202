@@ -1,6 +1,6 @@
 const BASE_URL = "https://apiqrcodeexe201-production.up.railway.app";
 export const getBusinessOwnerProfile = async () => {
-const token = localStorage.getItem("authToken");
+  const token = localStorage.getItem("authToken");
 
   console.log("TOKEN:", token);
 
@@ -8,24 +8,23 @@ const token = localStorage.getItem("authToken");
     throw new Error("Chưa đăng nhập");
   }
 
-  const response = await fetch(
-    `${BASE_URL}/api/v1/restaurants/me`,
-    {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  );
+  const response = await fetch(`${BASE_URL}/api/v1/restaurants/me`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  });
 
   if (!response.ok) {
     const text = await response.text();
-    console.error("401 response:", text);
+    console.error("API ERROR:", response.status, text);
     throw new Error("Unauthorized");
   }
 
   return response.json();
 };
+
 
 export const updateBusinessOwnerProfile = async (profileData) => {
       try{
