@@ -32,7 +32,29 @@ export default function Profile() {
     newPassword: "",
     confirmPassword: "",
   });
+  useEffect(() => {
+  const fetchProfile = async () => {
+    try {
+      const data = await getBusinessOwnerProfile();
 
+      setProfile({
+        name: data.name,
+        email: data.email,
+        phone: data.phone,
+        role: data.role,
+        avatar: data.avatarUrl,
+        restaurant: data.restaurantName,
+        address: data.address,
+      });
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchProfile();
+}, []);
   const handleChange = (e) => {
     setProfile({ ...profile, [e.target.name]: e.target.value });
   };

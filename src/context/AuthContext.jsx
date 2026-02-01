@@ -47,6 +47,7 @@ export const AuthProvider = ({ children }) => {
   }, [currentUser]);
 
   // Login - try backend API first, fallback to local mock users
+  
   const login = async (email, password) => {
     const BASE_URL = 'https://apiqrcodeexe201-production.up.railway.app';
 

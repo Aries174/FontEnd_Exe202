@@ -1,21 +1,32 @@
 const BASE_URL = "https://apiqrcodeexe201-production.up.railway.app";
-const TEST_TOKEN ="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyLCJlbWFpbCI6ImRlbW9AcmVzdGF1cmFudC5jb20iLCJyb2xlIjoicmVzdGF1cmFudCIsInJlc3RhdXJhbnRfaWQiOjEsImlzcyI6ImdvLWFwaSIsImV4cCI6MTc2OTk2OTM4NCwiaWF0IjoxNzY5ODgyOTg0fQ.04TQpNS7nDAl6qO9JHDKkHqklH2_V8gepFHHXonWfbc"
 export const getBusinessOwnerProfile = async () => {
-    try{
-        const response = await fetch(`${BASE_URL}/api/v1/business_owners/1/profile`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                       "Authorization": `Bearer ${TEST_TOKEN}`,
-            }
-        });
-        const data = await response.json();
-        return data;
-    } catch (error) {
-        console.error("Error fetching business owner profile:", error);
-        throw error;
+const token = localStorage.getItem("authToken");
+
+  console.log("TOKEN:", token);
+
+  if (!token) {
+    throw new Error("Chưa đăng nhập");
+  }
+
+  const response = await fetch(
+    `${BASE_URL}/api/v1/restaurants/me`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     }
+  );
+
+  if (!response.ok) {
+    const text = await response.text();
+    console.error("401 response:", text);
+    throw new Error("Unauthorized");
+  }
+
+  return response.json();
 };
+
 export const updateBusinessOwnerProfile = async (profileData) => {
       try{
     const response = await fetch(`${BASE_URL}/api/v1/business_owners/1/profile`, {

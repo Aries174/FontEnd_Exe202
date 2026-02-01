@@ -1,21 +1,5 @@
 import "bootstrap/dist/css/bootstrap.min.css";
-import { useState } from "react";
-<<<<<<< HEAD
-import { Container, Dropdown, Navbar, Modal, Button } from "react-bootstrap";
-import "../css/Header.css";
-
-export default function Header() {
-  const [showLogoutModal, setShowLogoutModal] = useState(false);
-
-  const handleViewProfile = () => {
-    window.location.href = "/profile";
-  };
-
-  const handleLogout = () => {
-    setShowLogoutModal(true);
-  };
-
-=======
+import { useEffect, useState } from "react";
 import { Container, Dropdown, Navbar, Modal, Button, Form, InputGroup } from "react-bootstrap";
 import { 
   Search, 
@@ -27,159 +11,38 @@ import {
   Menu
 } from "lucide-react";
 import "../css/Header.css";
+import { getBusinessOwnerProfile } from "../api/ProfileAPI";
 
 export default function Header({ toggleSidebar }) { // Nhận prop toggleSidebar nếu muốn làm mobile responsive sau này
   const [showLogoutModal, setShowLogoutModal] = useState(false);
-
+const [storeName, setStoreName] = useState("");
+const [email, setEmail] = useState("");
   // Giả lập số thông báo
   const notificationCount = 3; 
 
   const handleLogout = () => setShowLogoutModal(true);
   
->>>>>>> feature/bussinessPage
   const handleConfirmLogout = () => {
-    localStorage.removeItem("userInfo");
+localStorage.removeItem("authToken");
     window.location.href = "/login";
   };
+useEffect(() => {
+  const fetchRestaurant = async () => {
+    try {
+      const data = await getBusinessOwnerProfile();
+
+      setStoreName(data.name);
+      setEmail(data.email);
+    } catch (error) {
+      console.error("Không lấy được thông tin cửa hàng");
+    }
+  };
+
+  fetchRestaurant();
+}, []);
 
   return (
     <>
-<<<<<<< HEAD
-      <Navbar className="app-header" expand="lg">
-        <Container fluid>
-          {/* LEFT */}
-          <Navbar.Brand className="header-title">
-            Dashboard - <span></span>
-          </Navbar.Brand>
-
-          {/* RIGHT */}
-          <div className="header-user">
-            <Dropdown align="end">
-              <Dropdown.Toggle
-                as="div"
-                className="d-flex align-items-center"
-                style={{
-                  cursor: "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "12px",
-                  padding: "8px 12px",
-                  borderRadius: "8px",
-                  transition: "all 0.2s",
-                  background: "transparent"
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = "#f0f0f0";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = "transparent";
-                }}
-              >
-                <div className="avatar" style={{ cursor: "pointer" }}>A</div>
-
-                <div className="user-info">
-                  <div className="username">Mì cay Seoul</div>
-                  <div className="role">Restaurant_owner</div>
-                </div>
-              </Dropdown.Toggle>
-
-              <Dropdown.Menu style={{ minWidth: "280px", borderRadius: "12px", boxShadow: "0 4px 12px rgba(0,0,0,0.15)" }}>
-                {/* PROFILE PREVIEW */}
-                <div style={{ padding: "16px", borderBottom: "1px solid #e0e0e0" }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-                    <div 
-                      style={{
-                        width: "48px",
-                        height: "48px",
-                        borderRadius: "50%",
-                        background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                        color: "white",
-                        fontSize: "20px",
-                        fontWeight: "bold",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center"
-                      }}
-                    >
-                      A
-                    </div>
-                    <div>
-                      <div style={{ fontWeight: "700", color: "#000", fontSize: "15px" }}>adasdas</div>
-                      <div style={{ color: "#65676b", fontSize: "13px" }}>Restaurant_owner</div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* MENU ITEMS */}
-                <Dropdown.Item 
-                  onClick={handleViewProfile}
-                  style={{
-                    padding: "12px 16px",
-                    fontSize: "15px",
-                    color: "#000",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "12px",
-                    transition: "all 0.2s",
-                    cursor: "pointer"
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = "#f0f0f0";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = "transparent";
-                  }}
-                >
-                  <span style={{ fontSize: "18px" }}>👤</span>
-                  <span>Xem hồ sơ</span>
-                </Dropdown.Item>
-
-                <Dropdown.Item 
-                  style={{
-                    padding: "12px 16px",
-                    fontSize: "15px",
-                    color: "#000",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "12px",
-                    transition: "all 0.2s"
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = "#f0f0f0";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = "transparent";
-                  }}
-                >
-                  <span style={{ fontSize: "18px" }}>⚙️</span>
-                  <span>Cài đặt</span>
-                </Dropdown.Item>
-
-                <Dropdown.Divider style={{ margin: "8px 0" }} />
-
-                <Dropdown.Item 
-                  onClick={handleLogout}
-                  style={{
-                    padding: "12px 16px",
-                    fontSize: "15px",
-                    color: "#f44336",
-                    fontWeight: "600",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "12px",
-                    cursor: "pointer",
-                    transition: "all 0.2s"
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = "#ffebee";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = "transparent";
-                  }}
-                >
-                  <span style={{ fontSize: "18px" }}>🚪</span>
-                  <span>Đăng xuất</span>
-=======
       <Navbar className="app-header sticky-top" expand="lg">
         <Container fluid className="px-4">
           
@@ -226,7 +89,7 @@ export default function Header({ toggleSidebar }) { // Nhận prop toggleSidebar
                     />
                 </div>
                 <div className="user-info d-none d-lg-block">
-                  <div className="username">Mì cay Seoul</div>
+                  <div className="username">{storeName}</div>
                   <div className="role">Chủ cửa hàng</div>
                 </div>
                 <ChevronDown size={16} className="text-muted ms-2" />
@@ -249,7 +112,6 @@ export default function Header({ toggleSidebar }) { // Nhận prop toggleSidebar
                 
                 <Dropdown.Item onClick={handleLogout} className="dropdown-item-custom text-danger">
                   <LogOut size={18} className="me-2" /> Đăng xuất
->>>>>>> feature/bussinessPage
                 </Dropdown.Item>
               </Dropdown.Menu>
             </Dropdown>
@@ -257,67 +119,6 @@ export default function Header({ toggleSidebar }) { // Nhận prop toggleSidebar
         </Container>
       </Navbar>
 
-<<<<<<< HEAD
-      {/* LOGOUT CONFIRMATION MODAL */}
-      <Modal show={showLogoutModal} onHide={() => setShowLogoutModal(false)} centered size="sm">
-        <Modal.Header 
-          closeButton
-          style={{
-            background: "#f44336",
-            border: "none"
-          }}
-        >
-          <Modal.Title style={{ color: "white", fontWeight: "700" }}>
-            Xác nhận đăng xuất
-          </Modal.Title>
-        </Modal.Header>
-
-        <Modal.Body style={{ padding: "30px", textAlign: "center" }}>
-          <div style={{ fontSize: "48px", marginBottom: "15px" }}>⚠️</div>
-          <p style={{ fontSize: "15px", color: "#333", marginBottom: "10px" }}>
-            Bạn có chắc chắn muốn đăng xuất?
-          </p>
-          <p style={{ fontSize: "13px", color: "#999" }}>
-            Bạn sẽ cần đăng nhập lại để tiếp tục sử dụng
-          </p>
-        </Modal.Body>
-
-        <Modal.Footer style={{ padding: "20px 30px", borderTop: "2px solid #f0f0f0" }}>
-          <Button 
-            variant="secondary"
-            onClick={() => setShowLogoutModal(false)}
-            style={{
-              fontWeight: "600",
-              padding: "10px 24px",
-              borderRadius: "8px",
-              border: "none",
-              fontSize: "14px"
-            }}
-          >
-            Hủy
-          </Button>
-          <Button 
-            onClick={handleConfirmLogout}
-            style={{
-              background: "#f44336",
-              border: "none",
-              color: "white",
-              fontWeight: "600",
-              padding: "10px 24px",
-              borderRadius: "8px",
-              fontSize: "14px"
-            }}
-            onMouseEnter={(e) => {
-              e.target.style.background = "#d32f2f";
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.background = "#f44336";
-            }}
-          >
-            Đăng xuất
-          </Button>
-        </Modal.Footer>
-=======
       {/* MODAL LOGOUT - Đã làm mềm mại hơn */}
       <Modal show={showLogoutModal} onHide={() => setShowLogoutModal(false)} centered size="sm" contentClassName="border-0 rounded-4 overflow-hidden">
         <Modal.Body className="p-4 text-center">
@@ -336,7 +137,6 @@ export default function Header({ toggleSidebar }) { // Nhận prop toggleSidebar
                 </Button>
             </div>
         </Modal.Body>
->>>>>>> feature/bussinessPage
       </Modal>
     </>
   );

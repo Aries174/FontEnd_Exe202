@@ -1,6 +1,5 @@
 import './App.css'
 import Bussiness from './BussinessOwner/component/Page/Bussiness'
-<<<<<<< HEAD
 import OnboardingPage from './OnboardingPage/OnboardingPage'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import LandingPage from './LandingPage/LandingPage'
@@ -28,18 +27,6 @@ function App() {
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
-=======
-import { BrowserRouter } from 'react-router-dom'
-
-function App() {
-
-  return (
-    <>
-  <BrowserRouter>
-    <Bussiness />
-  </BrowserRouter>
-    </>
->>>>>>> feature/bussinessPage
   )
 }
 

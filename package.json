@@ -11,10 +11,7 @@
   },
   "dependencies": {
     "bootstrap": "^5.3.8",
-<<<<<<< HEAD
-=======
     "lucide-react": "^0.563.0",
->>>>>>> feature/bussinessPage
     "qrcode.react": "^4.2.0",
     "react": "^19.2.0",
     "react-bootstrap": "^2.10.10",
