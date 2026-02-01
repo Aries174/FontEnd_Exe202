@@ -15,12 +15,12 @@ export default function Bussiness(){
       <div className="flex-grow-1">
         <Header />
           <Routes>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/orders" element={<OrderManagement />} />
-            <Route path="/orders/table/:id" element={<OrderDetail/>} />
-             <Route path="/menu" element={<MenuManagement/>} />
-             <Route path="/profile" element={<Profile/>} />
-             <Route path="/payment" element={<Payment/>} />
+            <Route index element={<Dashboard />} />
+            <Route path="orders" element={<OrderManagement />} />
+            <Route path="orders/table/:id" element={<OrderDetail/>} />
+             <Route path="menu" element={<MenuManagement/>} />
+             <Route path="profile" element={<Profile/>} />
+             <Route path="payment" element={<Payment/>} />
           </Routes>
       </div>
 

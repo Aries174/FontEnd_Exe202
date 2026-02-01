@@ -1,33 +1,73 @@
-import "bootstrap/dist/css/bootstrap.min.css";
+import React from "react";
 import { Nav } from "react-bootstrap";
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import "../css/Sidebar.css";
+import {
+  LayoutDashboard,
+  UtensilsCrossed,
+  ClipboardList,
+  LogOut
+} from "lucide-react";
+
 export default function Sidebar() {
   return (
-    <div className="sidebar bg-red sidebar-menu">
-      <div className="sidebar-header">
-        <Nav.Link className="sidebar-header home-link">
-          <div className="logo">
-            <img src="src/assets/img/image3.png" alt="logo" />
+    <div className="sidebar d-flex flex-column justify-content-between">
+      <div>
+        {/* Header */}
+        <div className="sidebar-header">
+          <div className="logo-container">
+            <img
+              src="src/assets/img/image3.png"
+              alt="Foodie"
+              onError={(e) => (e.target.style.display = "none")}
+            />
+            <UtensilsCrossed size={24} className="fallback-logo text-primary" />
           </div>
-          <span className="brand">Foodie</span>
-        </Nav.Link> 
+          <span className="brand-name">Foodie POS</span>
+        </div>
+
+        {/* Menu */}
+        <Nav className="flex-column gap-2 mt-3">
+          <NavLink
+            to="/bussiness"
+            end
+            className={({ isActive }) =>
+              `nav-item ${isActive ? "active" : ""}`
+            }
+          >
+            <LayoutDashboard size={20} />
+            <span>Tổng quan</span>
+          </NavLink>
+
+          <NavLink
+            to="/bussiness/orders"
+            className={({ isActive }) =>
+              `nav-item ${isActive ? "active" : ""}`
+            }
+          >
+            <UtensilsCrossed size={20} />
+            <span>Bàn & Đơn</span>
+          </NavLink>
+
+          <NavLink
+            to="/bussiness/menu"
+            className={({ isActive }) =>
+              `nav-item ${isActive ? "active" : ""}`
+            }
+          >
+            <ClipboardList size={20} />
+            <span>Thực đơn</span>
+          </NavLink>
+        </Nav>
       </div>
-      <Nav className="flex-column" to="/" as={Link}>
-        <Nav.Link className="">
-          <div>DashBoard</div>
-        </Nav.Link>
-        <Nav.Link to="/orders" as={Link}>
-          <div>Bàn Ăn</div>
-        </Nav.Link>
-        <Nav.Link to="/menu" as={Link}>
-          <div>Menu</div>
-        </Nav.Link>
-        <Nav.Link>
-          <div>Báo Cáo</div>
-        </Nav.Link>
-      </Nav>
+
+      {/* Footer */}
+      <div className="sidebar-footer">
+        <div className="nav-item text-danger mt-1" style={{ cursor: "pointer" }}>
+          <LogOut size={20} />
+          <span>Đăng xuất</span>
+        </div>
+      </div>
     </div>
   );
 }

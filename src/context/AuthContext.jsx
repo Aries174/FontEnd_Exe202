@@ -92,7 +92,7 @@ export const AuthProvider = ({ children }) => {
 
       if (!receivedToken) {
         return { success: false, error: 'Server không trả về Token' };
-      }
+}
 
       // Cập nhật State
       setToken(receivedToken);
@@ -178,7 +178,7 @@ export const AuthProvider = ({ children }) => {
 
       if (userFromBody) {
         // Normalize role if backend uses alternate names
-        if (userFromBody.role === 'restaurant') userFromBody.role = USER_ROLES.RESTAURANT_OWNER;
+if (userFromBody.role === 'restaurant') userFromBody.role = USER_ROLES.RESTAURANT_OWNER;
         setCurrentUser(userFromBody);
         return { success: true, user: userFromBody };
       }
