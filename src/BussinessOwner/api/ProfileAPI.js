@@ -1,3 +1,5 @@
+import { getRestaurantId } from "../../utils/auth";
+
 const BASE_URL = "https://apiqrcodeexe201-production.up.railway.app";
 export const getBusinessOwnerProfile = async () => {
   const token = localStorage.getItem("authToken");
@@ -25,25 +27,39 @@ export const getBusinessOwnerProfile = async () => {
   return response.json();
 };
 
-
 export const updateBusinessOwnerProfile = async (profileData) => {
-      try{
-    const response = await fetch(`${BASE_URL}/api/v1/business_owners/1/profile`, {
-      method: "PUT",
-      headers: {
-        "Content-type": "application/json",
-        "Authorization": `Bearer ${TEST_TOKEN}`,
-      },
-      body: JSON.stringify(profileData),
-    });
-    const responseData = await response.json();
+  try {
+    const token = localStorage.getItem("authToken");
+    if (!token) throw new Error("Chưa đăng nhập");
+
+    const restaurantId = getRestaurantId();
+    if (!restaurantId) {
+      throw new Error("Không tìm thấy restaurantId trong token");
+    }
+
+    const response = await fetch(
+      `${BASE_URL}/api/v1/restaurants/${restaurantId}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(profileData),
+      }
+    );
+
+    const responseData =
+      response.status !== 204 ? await response.json() : null;
+
     if (!response.ok) {
       console.error("API Error Response:", responseData);
-      throw new Error(`fetch failed: ${response.statusText} - ${JSON.stringify(responseData)}`);
+      throw new Error(responseData?.message || "Update profile failed");
     }
+
     return responseData;
-    }catch (error) {    
-    console.error("fetch failed: ", error);
+  } catch (error) {
+    console.error("fetch failed:", error);
     throw error;
   }
 };

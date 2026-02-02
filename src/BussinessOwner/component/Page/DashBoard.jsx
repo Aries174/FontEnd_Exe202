@@ -1,7 +1,7 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Container, Row, Col, Card, Table, Badge, Button } from "react-bootstrap";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { 
   DollarSign, 
   ShoppingBag, 
@@ -11,10 +11,10 @@ import {
   CheckCircle,
   UtensilsCrossed
 } from "lucide-react";
+import { chartStatistics, overallStatistics } from "../../api/DashBoardApi";
 
 // --- Helper Functions ---
 const getDaysInMonth = (month, year) => new Date(year, month, 0).getDate();
-
 const generateYearlyData = (year) => {
   return Array.from({ length: 12 }, (_, i) => ({
     month: i + 1,
@@ -78,22 +78,81 @@ const OrderItem = ({ order, onComplete }) => {
 export default function Dashboard() {
   const currentYear = new Date().getFullYear();
   const [year, setYear] = useState(currentYear);
-
+const [overview, setOverview] = useState(null);
+const [loadingStats, setLoadingStats] = useState(true);
   const [orders, setOrders] = useState([
     { id: 1, source: "Bàn 3", channel: "Tại chỗ", items: ["Phở bò", "Quẩy"], time: new Date() },
     { id: 2, source: "Khách lẻ", channel: "Takeaway", items: ["Trà sữa Full topping"], time: new Date() },
     { id: 3, source: "GrabFood", channel: "Giao hàng", items: ["Cơm gà xối mỡ"], time: new Date() },
     { id: 4, source: "ShopeeFood", channel: "Giao hàng", items: ["Bún bò Huế"], time: new Date() },
   ]);
+  const [chartData, setChartData] = useState([]);
+const [loadingChart, setLoadingChart] = useState(false);
 
   const completeOrder = (id) => {
     setOrders((prev) => prev.filter((o) => o.id !== id));
   };
+useEffect(() => {
+  const fetchOverview = async () => {
+    setLoadingStats(true);
+    try {
+      const res = await overallStatistics();
+      if (res?.success) {
+        console.log("OVERVIEW:", res.data);
+        setOverview(res.data);
+      }
+    } catch (e) {
+      console.error("Lỗi load thống kê:", e);
+    } finally {
+      setLoadingStats(false);
+    }
+  };
 
-  const revenueData = generateYearlyData(year);
+  fetchOverview();
+}, []);
+useEffect(() => {
+  const fetchChart = async () => {
+    setLoadingChart(true);
+    try {
+      const res = await chartStatistics(year);
+      if (res?.success) {
+        /**
+         * API trả về:
+         * chart_data: null | [{ month: 1, revenue: 123456 }]
+         */
+        const apiData = res.data?.chart_data || [];
+
+        // Chuẩn hóa đủ 12 tháng cho Recharts
+        const fullYearData = Array.from({ length: 12 }, (_, i) => {
+          const month = i + 1;
+          const found = apiData.find((d) => d.month === month);
+          return {
+            month,
+            revenue: found ? Number(found.revenue) : 0,
+          };
+        });
+
+        setChartData(fullYearData);
+      }
+    } catch (e) {
+      console.error("Lỗi load chart:", e);
+      setChartData([]);
+    } finally {
+      setLoadingChart(false);
+    }
+  };
+
+  fetchChart();
+}, [year]);
+
+  // const revenueData = generateYearlyData(year);
 
   // Format currency helper
-  const formatCurrency = (val) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(val);
+  const formatCurrency = (val) =>
+  new Intl.NumberFormat("vi-VN", {
+    style: "currency",
+    currency: "VND",
+  }).format(Number(val) || 0);
   const formatCompactNumber = (number) => new Intl.NumberFormat('vi-VN', { notation: "compact", compactDisplay: "short" }).format(number);
 
   return (
@@ -113,19 +172,43 @@ export default function Dashboard() {
 
       {/* Stats Cards */}
       <Row className="g-3 mb-4">
-        <Col md={3}>
-          <StatCard title="Doanh thu hôm nay" value="18.2 tr" icon={DollarSign} color="success" subText="+12% so với hqua" />
-        </Col>
-        <Col md={3}>
-          <StatCard title="Đơn hàng" value="124" icon={ShoppingBag} color="primary" />
-        </Col>
-        <Col md={3}>
-          <StatCard title="Số khách" value="98" icon={Users} color="info" />
-        </Col>
-        <Col md={3}>
-          <StatCard title="Giá trị TB / đơn" value="147k" icon={TrendingUp} color="warning" />
-        </Col>
-      </Row>
+  <Col md={3}>
+    <StatCard
+      title="Doanh thu hôm nay"
+      value={loadingStats ? "..." : formatCurrency(overview?.today?.revenue)}
+      icon={DollarSign}
+      color="success"
+    />
+  </Col>
+
+  <Col md={3}>
+    <StatCard
+      title="Đơn hàng"
+      value={loadingStats ? "..." : overview?.today?.orders}
+      icon={ShoppingBag}
+      color="primary"
+    />
+  </Col>
+
+  <Col md={3}>
+    <StatCard
+      title="Số bàn đang dùng"
+      value={loadingStats ? "..." : overview?.tables?.occupied}
+      icon={Users}
+      color="info"
+    />
+  </Col>
+
+  <Col md={3}>
+    <StatCard
+      title="Giá trị TB / đơn"
+      value={loadingStats ? "..." : formatCurrency(overview?.today?.avg_order_value)}
+      icon={TrendingUp}
+      color="warning"
+    />
+  </Col>
+</Row>
+
 
       {/* Main Content Area */}
       <Row className="g-4">
@@ -148,7 +231,7 @@ export default function Dashboard() {
               </div>
               <div style={{ width: "100%", height: 320 }}>
                 <ResponsiveContainer>
-                  <BarChart data={revenueData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                  <BarChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e9ecef" />
                     <XAxis 
                         dataKey="month" 

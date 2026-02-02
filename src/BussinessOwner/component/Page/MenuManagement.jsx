@@ -36,6 +36,7 @@ import {
   getMenuAll,
   updateCategory,
   updateMenuItem,
+  uploadMenuImage,
   // Giả định bạn có thêm các API này trong file MenuManagementAPI
   // updateCategory,
   // deleteCategory,
@@ -219,34 +220,70 @@ if (!newCategoryName.trim()) {
     }
   };
 
-  const handleSubmitMenu = async () => {
-    if (!form.name || !form.price) return alert("Vui lòng nhập đủ!");
+const handleSubmitMenu = async () => {
+  if (!form.name || !form.price) {
+    alert("Vui lòng nhập đủ!");
+    return;
+  }
+
+  try {
+    let imageUrl = "";
+
+    if (form.image) {
+      const uploadRes = await uploadMenuImage(form.image);
+
+      imageUrl =
+        uploadRes?.data?.url ||
+        uploadRes?.url ||
+        uploadRes?.image_url ||
+        "";
+
+      if (!imageUrl) throw new Error("Upload ảnh thất bại");
+    }
+
     const payload = {
       name: form.name.trim(),
       price: Number(form.price),
       category_id: Number(form.category),
       tags: form.tags,
-      image: "", // Xử lý upload ảnh nếu cần
+      image: imageUrl,
     };
 
-    try {
-      if (editingId) {
-        await updateMenuItem(editingId, payload);
-      } else {
-        await createMenuItem(payload);
-      }
-      fetchMenus();
-      closeModal();
-      alert("Thành công!");
-    } catch (error) {
-      alert("Thất bại!");
+    if (editingId) {
+      await updateMenuItem(editingId, payload);
+    } else {
+      await createMenuItem(payload);
     }
-  };
+
+    fetchMenus();
+    closeModal();
+  } catch (e) {
+    console.error(e);
+    alert("Thao tác thất bại ❌");
+  }
+};
 
   const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) setForm({ ...form, image: file, preview: URL.createObjectURL(file) });
-  };
+  const file = e.target.files[0];
+  if (!file) return;
+
+  // Optional: validate ảnh
+  if (!file.type.startsWith("image/")) {
+    alert("Vui lòng chọn file ảnh");
+    return;
+  }
+
+  if (file.size > 2 * 1024 * 1024) {
+    alert("Ảnh không được vượt quá 2MB");
+    return;
+  }
+
+  setForm((prev) => ({
+    ...prev,
+    image: file,
+    preview: URL.createObjectURL(file),
+  }));
+};
 
   const formatCurrency = (v) => new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(v);
 

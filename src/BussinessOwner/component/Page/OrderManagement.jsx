@@ -403,7 +403,7 @@ export default function OrderManagement() {
                     {/* Header Card */}
                     <div className="d-flex justify-content-between align-items-start mb-2">
                       <div
-                        onClick={() => navigate(`/orders/table/${table.id}`)}
+                        onClick={() => navigate(`table/${table.id}`)}
                         style={{ cursor: "pointer" }}
                       >
                         <h5

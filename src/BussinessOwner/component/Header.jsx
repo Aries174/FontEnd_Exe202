@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import "../css/Header.css";
 import { getBusinessOwnerProfile } from "../api/ProfileAPI";
-
+import { Link } from "react-router-dom";
 export default function Header({ toggleSidebar }) { // Nhận prop toggleSidebar nếu muốn làm mobile responsive sau này
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 const [storeName, setStoreName] = useState("");
@@ -105,9 +105,14 @@ useEffect(() => {
                     <small className="text-muted">{email}</small>
                 </div>
                 
-                <Dropdown.Item href="/profile" className="dropdown-item-custom">
-                  <User size={18} className="me-2 text-primary" /> Hồ sơ cá nhân
-                </Dropdown.Item>
+                <Dropdown.Item
+  as={Link}
+  to="/bussiness/profile"
+  className="dropdown-item-custom"
+>
+  <User size={18} className="me-2 text-primary" />
+  Hồ sơ cá nhân
+</Dropdown.Item>
                 <Dropdown.Item href="/settings" className="dropdown-item-custom">
                   <Settings size={18} className="me-2 text-primary" /> Cài đặt hệ thống
                 </Dropdown.Item>
