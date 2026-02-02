@@ -112,11 +112,19 @@ export default function OrderManagement() {
       if (!Array.isArray(tableList)) tableList = [];
 
       const activeTables = tableList
-        .filter((table) => table.is_active === true)
-        .map((table) => ({
-          ...table,
-          status: BACKEND_TO_FRONTEND_STATUS[table.status] || "empty",
-        }));
+  .filter((table) => table.is_active === true)
+  .map((table) => {
+    const hasActiveOrder =
+      table.active_orders_count && table.active_orders_count > 0;
+
+    return {
+      ...table,
+      status: hasActiveOrder
+        ? "serving"
+        : BACKEND_TO_FRONTEND_STATUS[table.status] || "empty",
+    };
+  });
+
 
       setTables(activeTables);
     } catch (error) {

@@ -34,21 +34,27 @@ export default function OrderDetail() {
     const fetchOrder = async () => {
       try {
         const data = await getOrderDetail(id);
-        // Đảm bảo luôn có mảng items
-        if (!data.items) data.items = [];
-        setOrder(data);
+
+        const activeOrder = data.active_orders?.[0];
+        if (!activeOrder) {
+          throw new Error("Bàn chưa có đơn hàng");
+        }
+
+        setOrder({
+          tableName: data.table?.name,
+          openedAt: activeOrder.created_at,
+          items: activeOrder.items || [],
+          totalAmount: data.total_amount || 0,
+        });
       } catch (err) {
         setError(err.message || "Lấy chi tiết đơn hàng thất bại");
       } finally {
         setLoading(false);
       }
     };
+
     fetchOrder();
   }, [id]);
-
-  const handleCloseTable = () => {
-    navigate("/orders");
-  };
 
   if (loading) {
     return (
@@ -68,8 +74,8 @@ export default function OrderDetail() {
     );
   }
 
-  const items = order.items || [];
-  const total = items.reduce((sum, item) => sum + (item.qty || 0) * (item.price || 0), 0);
+  const items = order.items;
+  const total = order.totalAmount;
 
   return (
     <Container fluid className="p-4 bg-light min-vh-100">
@@ -77,7 +83,7 @@ export default function OrderDetail() {
         <Col>
           <h4 className="fw-bold">{order.tableName || `Bàn ${id}`}</h4>
           <p className="text-muted mb-0">
-            Mở bàn lúc {order.openedAt || order.createdAt || "-"}
+            Mở bàn lúc {order.openedAt || "-"}
           </p>
         </Col>
         <Col className="text-end">
@@ -92,6 +98,7 @@ export default function OrderDetail() {
           <Card className="shadow-sm mb-4">
             <Card.Body>
               <h6 className="mb-3">Danh sách món</h6>
+
               {items.length === 0 ? (
                 <p className="text-muted">Chưa có món nào được order.</p>
               ) : (
@@ -101,18 +108,32 @@ export default function OrderDetail() {
                       <div className="d-flex justify-content-between align-items-start">
                         <div>
                           <h6 className="mb-1">
-                            {item.name} <span className="text-muted">x{item.qty}</span>
+                            {item.item_name}{" "}
+                            <span className="text-muted">
+                              x{item.quantity}
+                            </span>
                           </h6>
-                          {item.note && (
-                            <small className="text-muted">📝 {item.note}</small>
+
+                          {item.notes && (
+                            <small className="text-muted">
+                              📝 {item.notes}
+                            </small>
                           )}
                         </div>
+
                         <div className="text-end">
-                          <Badge bg={statusConfig[item.status]?.bg || "secondary"}>
-                            {statusConfig[item.status]?.label || item.status}
+                          <Badge
+                            bg={
+                              statusConfig[item.prep_status]?.bg ||
+                              "secondary"
+                            }
+                          >
+                            {statusConfig[item.prep_status]?.label ||
+                              item.prep_status}
                           </Badge>
+
                           <div className="fw-semibold mt-2">
-                            {((item.qty || 0) * (item.price || 0)).toLocaleString()} đ
+                            {item.line_total.toLocaleString()} đ
                           </div>
                         </div>
                       </div>
@@ -128,15 +149,23 @@ export default function OrderDetail() {
           <Card className="shadow-sm">
             <Card.Body>
               <h6 className="mb-3">Thanh toán</h6>
+
               <div className="d-flex justify-content-between mb-2">
                 <span>Tạm tính</span>
-                <span className="fw-semibold">{total.toLocaleString()} đ</span>
+                <span className="fw-semibold">
+                  {total.toLocaleString()} đ
+                </span>
               </div>
+
               <div className="d-flex justify-content-between mb-3">
                 <span>VAT (10%)</span>
-                <span className="fw-semibold">{(total * 0.1).toLocaleString()} đ</span>
+                <span className="fw-semibold">
+                  {(total * 0.1).toLocaleString()} đ
+                </span>
               </div>
+
               <hr />
+
               <div className="d-flex justify-content-between mb-3 fs-5">
                 <strong>Tổng cộng</strong>
                 <strong className="text-success">
@@ -151,10 +180,11 @@ export default function OrderDetail() {
               >
                 Thanh toán
               </Button>
+
               <Button
                 variant="outline-danger"
                 className="w-100"
-                onClick={handleCloseTable}
+                onClick={() => navigate("/orders")}
               >
                 Đóng bàn
               </Button>
